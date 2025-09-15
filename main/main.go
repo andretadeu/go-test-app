@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -25,11 +26,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	http.HandleFunc("/", handler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
 
 	_, err := connectToDb()
 	if err != nil {
-		log.Fatal(err)
+		log.Panic().Err(err).Msg("mongodb connection error.")
 	}
+
+	log.Info().Msg("listening to 8080...")
+	log.Fatal().Err(http.ListenAndServe(":8080", nil)).Msg("error while listening on port 8080.")
 }

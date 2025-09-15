@@ -2,11 +2,16 @@ services:
   db:
     image: mongo:8.0.13
     restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=testapp
+      - MONGO_INITDB_ROOT_PASSWORD=testapp147
     ports:
       - "33000:27017"
   
   test-app:
-    image: andretadeu/go-test-app:0.1.0
+    image: andretadeu/go-test-app:0.1.1
+    environment:
+      - MONGODB_URI=mongodb://testapp:testapp147@mongodb/testapp?retryWrites=true&w=majority
     ports:
       - "9980:8080"
     depends_on:
